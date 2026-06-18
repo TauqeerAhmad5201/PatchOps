@@ -1,0 +1,79 @@
+# config/settings.yaml
+# Central configuration — all tuneable parameters live here
+# Override any value via environment variable
+
+app:
+  name: PatchOps
+  version: "1.0.0"
+  env: ${APP_ENV:development}
+  debug: true
+
+agents:
+  intake:
+    model: ${GEMINI_MODEL_CLASSIFICATION:gemini-1.5-flash-8b}
+    patching_categories:
+      - patching
+      - patch management
+      - os update
+      - windows update
+      - security patch
+      - cumulative update
+      - hotfix
+      - kernel update
+      - firmware update
+      - vulnerability remediation
+    classification_threshold: 0.7
+
+  baseline:
+    model: ${GEMINI_MODEL_AGENT:gemini-1.5-flash}
+    max_tokens: 4096
+
+  execution:
+    max_parallel_reboots: ${MAX_PARALLEL_REBOOTS:5}
+    reboot_timeout_seconds: ${REBOOT_TIMEOUT_SECONDS:300}
+    pre_reboot_wait_seconds: 10
+    post_reboot_wait_seconds: 30
+    model: ${GEMINI_MODEL_AGENT:gemini-1.5-flash}
+
+  validation:
+    health_check_retries: ${HEALTH_CHECK_RETRIES:3}
+    health_check_interval_seconds: ${HEALTH_CHECK_INTERVAL_SECONDS:30}
+    deviation_threshold_percent: ${DEVIATION_THRESHOLD_PERCENT:15}
+    model: ${GEMINI_MODEL_AGENT:gemini-1.5-flash}
+
+  rca:
+    model: ${GEMINI_MODEL_RCA:gemini-1.5-pro}
+    max_tokens: 8192
+    log_lookback_hours: 24
+
+winrm:
+  username: ${WINRM_USERNAME:Administrator}
+  password: ${WINRM_PASSWORD:}
+  port: ${WINRM_PORT:5985}
+  use_ssl: ${WINRM_USE_SSL:false}
+  mock_mode: ${WINRM_MOCK_MODE:true}
+  connection_timeout: 30
+  operation_timeout: 60
+
+servicenow:
+  instance: ${SERVICENOW_INSTANCE:}
+  user: ${SERVICENOW_USER:}
+  password: ${SERVICENOW_PASSWORD:}
+  webhook_secret: ${WEBHOOK_SECRET:}
+  incident_category: "Software"
+  incident_assignment_group: "Infrastructure"
+
+email:
+  smtp_host: ${SMTP_HOST:smtp.gmail.com}
+  smtp_port: ${SMTP_PORT:587}
+  user: ${SMTP_USER:}
+  password: ${SMTP_PASSWORD:}
+  from: ${EMAIL_FROM:patchops@company.com}
+  team_dl: ${EMAIL_TEAM_DL:infra-team@company.com}
+  use_tls: true
+
+logging:
+  level: INFO
+  format: "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+  sse_poll_interval_ms: 1500
+  sse_max_idle_seconds: 300
